@@ -1,5 +1,5 @@
 import CookieConsent from './components/CookieConsent'
-import Header from './components/Header/Header'
+import Header from './components/header/Header'
 
 function App() {
   
