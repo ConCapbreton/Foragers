@@ -1,0 +1,29 @@
+.circle-x {
+    border: 3.5px solid var(--forager-orange);
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+}
+
+.circle-line {
+    border: 2.5px solid var(--forager-orange);
+    width: 25px;
+    border-radius: 20px;
+    transition: border-color 0.3s ease;
+}
+
+.line-one {
+    margin: 15px auto 0 auto;
+    rotate: 45deg;
+}
+
+.line-two {
+    margin: -4px auto 0 auto;
+    rotate: -45deg;
+}
+
+.circle-x:hover, .circle-x:hover .circle-line {
+    border-color: var(--forager-white);
+}

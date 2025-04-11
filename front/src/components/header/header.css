@@ -1,16 +1,10 @@
-@keyframes slideIn {
-    0% {
-        transform: translateX(-100%)
-    }
-    100% {
-        transform: translateX(0)
-    }
-}
+/* Heaer component */
 
 .header {
     width: 100%;
     height: 70px;
     background-color: var(--forager-red);
+    background-image: url('https://www.transparenttextures.com/patterns/noisy.png');
     display: flex;
     flex-direction: row;
     justify-content:space-between;
@@ -20,6 +14,8 @@
 .header-logo {
     margin-left: 10px;
 }
+
+/* HamburgerMenu component */
 
 .hamburger {
     width: 70px;
@@ -40,6 +36,17 @@
 
 #desktop-nav, #hide-mob-nav {
     display: none;
+}
+
+/* Mobile Nav component */
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%)
+    }
+    100% {
+        transform: translateX(0)
+    }
 }
 
 #mob-nav {
@@ -77,28 +84,7 @@
     padding: 10px 10px;
 }
 
-.circle-x {
-    border: 4px solid var(--forager-orange);
-    border-radius: 50%;
-    height: 45px;
-    width: 45px;
-}
-
-.circle-line {
-    border: 3px solid var(--forager-orange);
-    width: 30px;
-    border-radius: 20px;
-}
-
-.line-one {
-    margin: 20px auto 0 auto;
-    rotate: 45deg;
-}
-
-.line-two {
-    margin: -6px auto 0 auto;
-    rotate: -45deg;
-}
+/* MobileNavOptions component */
 
 #mob-btn-div {
     margin-top: 1rem;
@@ -117,15 +103,6 @@
     font-size: 1.3rem;
     color: var(--forager-white);
     border-radius: 50px;
-}
-
-footer {
-    height: 45px;
-    width: 100%;
-    background-color: var(--forager-red);
-    color: white;
-    display: grid;
-    place-items: center;
 }
 
 @media (min-width: 768px) {
@@ -153,6 +130,9 @@ footer {
         font-size: 1.3rem;
         color: var(--forager-white);
         border-radius: 50px;
+        transition: background-color 0.5s ease;
+        transition: color 0.5s ease;
+        cursor: pointer;
     }
     .nav-btn:hover {
         background-color: var(--forager-white);

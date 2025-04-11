@@ -1,0 +1,64 @@
+@keyframes modalAppear {
+  from {
+    transform: scaleX(0); 
+  }
+  to {
+    transform: scaleX(1); 
+  }
+}
+
+.hide-modal {
+  display: none;
+}
+
+.modal-div {
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(52, 152, 219, 0.5);
+  display: flex;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  animation: modalAppear 400ms; 
+}
+
+.modal-display {
+  width: 310px;
+  height: 550px;
+  border-radius: 20px;
+  background-color: var(--forager-red);
+  background-image: url('https://www.transparenttextures.com/patterns/noisy.png');
+  position: absolute;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* nextPage = true */
+.first-div.active {
+  transform: translateX(0); /* Slide out to the left */
+}
+
+.second-div {
+  transform: translateX(100vw); /* Hidden initially to the right */
+}
+
+/* nextPage = false */
+.first-div {
+  transform: translateX(-100vw); /* Centered initially */
+}
+
+.second-div.active {
+  transform: translateX(0); /* Slide in from the right */
+}
+
+.modal-header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 5px 10px;
+}
+

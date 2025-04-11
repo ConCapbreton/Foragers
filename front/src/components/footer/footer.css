@@ -1,0 +1,23 @@
+#footer-container {
+    height: 45px;
+    width: 100%;
+    background-color: var(--forager-red);
+    background-image: url('https://www.transparenttextures.com/patterns/noisy.png');
+    color: var(--forager-white);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#footer-container>p, #footer-container>a {
+    text-align: center;
+    font-size: 10px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#footer-container>p:hover, #footer-container>a:hover {
+    color: var(--forager-orange);
+    transform: scale(1.2);
+}

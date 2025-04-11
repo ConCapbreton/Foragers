@@ -1,12 +1,33 @@
 @import url('https://fonts.cdnfonts.com/css/lucida-handwriting-std');
 
 body {
+  --forager-white: #e8e7e7;
   --forager-red: #b94d4d;
   --forager-orange: #ffbc6c;
-  --forager-white: #e8e7e7;
+  
   
   box-sizing: border-box;
   margin: 0;
   padding: 0; 
   font-family: 'Lucida Handwriting Std', sans-serif;
+}
+
+.page {
+  background-color: var(--forager-white);
+  background-image: url('https://www.transparenttextures.com/patterns/noisy.png'); 
+  min-height: calc(100vh - 131px);
+  width: 100%;
+  padding-top: 1rem;
+}
+
+.page-title {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .page {
+    min-height: calc(100vh - 151px);
+  }
 }
