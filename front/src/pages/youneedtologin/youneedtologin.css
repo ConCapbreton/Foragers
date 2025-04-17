@@ -1,0 +1,23 @@
+#you-need-to-login-div {
+    box-sizing: border-box;
+    background: var(--forager-red);
+    width: 310px;
+    margin: 0 auto;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+    padding: 50px 10px;
+    margin-top: 2rem;
+}
+
+#you-need-to-login-div>* {
+    margin: 0;
+}
+
+.home-link {
+    display: inline-block;
+}

@@ -1,17 +1,21 @@
 const User = require('../models/User')
 const argon2 = require('argon2')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const { generateTokenAndSendCookie } = require('../utils/generateTokenAndSendCookie')
 // const { validateHuman } = require('../services/validateHuman')
-const { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } = require('../mailTrap/emails')
+const { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } = require('../services/emailService')
 const { generateAccessToken } = require('../utils/generateAccessToken')
 
 
 const signup = async (req, res) => {
-    const {email, password, name} = req.body
-    
+    const {email, password, username} = req.body
+    //USER MODEL: 
+    // username, email, dob, password, roles, lastLogin, isVerified, isActive, termsAccepted, termsAcceptedAt, termsVersion
+
+
     try {
-        if (!email || !password || !name) {
+        if (!email || !password || !username) {
             //BETTER TO res.status().json() here so that you can provide the correct res status
             throw new Error("All fields are required")
         }
@@ -28,7 +32,7 @@ const signup = async (req, res) => {
         const user = new User({
             email,
             password: hashedPwd,
-            name,
+            username,
             verificationToken: verificationToken,
             verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000 //24 hours
         })
@@ -37,7 +41,7 @@ const signup = async (req, res) => {
 
         sendVerificationEmail(user.email, verificationToken)
         
-        res.status(201).json({success: true, message: "User created", user: {name: user.name}})
+        res.status(201).json({success: true, message: "User created", username})
 
     } catch (error) {
         res.status(400).json({success: false, message: error.message})
@@ -61,17 +65,18 @@ const verifyEmail = async (req, res) => {
         user.verificationTokenExpiresAt = undefined
         await user.save()
 
-        await sendWelcomeEmail(user.email, user.name)
+        await sendWelcomeEmail(user.email, user.username)
 
         generateTokenAndSendCookie(res, user._id)
         accessToken = generateAccessToken(user.email)
 
+        //GOING TO LOG IN THE USER IMMEDIATELY
         res.status(200).json({
             success: true, 
             message: "Email verified", 
             accessToken,         
             user: {
-                name: user.name
+                username: user.username
             }
         })
 
@@ -98,6 +103,8 @@ const login = async (req, res) => {
             return res.status(400).json({success: false, message: "Invalid credentials"})
         }
 
+        //LOGIC HERE FOR isActive / isVerified? 
+
         const isPasswordValid = await argon2.verify(user.password, password) 
         if (!isPasswordValid) {
             return res.status(400).json({success: false, message: "Invalid credentials"})
@@ -113,17 +120,15 @@ const login = async (req, res) => {
             success: true,
             message: "Logged in successfully",
             accessToken,         
-            user: {
-                name: user.name
-            }
+            username: user.username
         })
         
     } catch (error) {
-        res.status(400).json({success: false, message: error.message})
+        res.status(500).json({success: false, message: error.message})
     }
 }
 
-const logout = async (req, res) => {
+const logout = async (_req, res) => {
     res.clearCookie("token")
     res.status(200).json({success: true, message: "Logged out successfully"})
 } 
@@ -133,6 +138,7 @@ const forgotPassword = async (req, res) => {
     
     try {
         const user = await User.findOne({ email })
+        
 
         if (!user) {
             return res.status(400).json({ success: false, message: "User not found"})
@@ -146,7 +152,7 @@ const forgotPassword = async (req, res) => {
         
         await user.save()
         
-        await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+        await sendPasswordResetEmail(user.email, `${process.env.RESET_PASS_LINK}${resetToken}`)
 
         res.status(200).json({success: true, message: "Password reset link sent to your email"})
     } catch (error) {
@@ -185,19 +191,9 @@ const resetPassword = async (req, res) => {
     }
 }
 
-//POTENTIALLY DELETE
-const authCheck = async (req, res) => {
-    try {
-        const user = await User.findById(req.userId)
-        if (!user) return res.status(400).json({success: false, message: "User not found"})
-        res.status(200).json({ success: true, user: {username: user.name} })
-    } catch (error) {
-        res.status(400).json({success: false, message: error.message})
-    }
-}
-
 const refresh = async (req, res) => {
     try {
+        
         const cookies = req.cookies
 
         if (!cookies?.token) return res.status(401).json({success: false, message: 'Unauthorized'})
@@ -216,11 +212,43 @@ const refresh = async (req, res) => {
 
                 const accessToken = generateAccessToken(foundUser.email)
 
-                res.json({ success: true, accessToken })
+                res.json({ success: true, user: foundUser.username, accessToken })
             }
         )
-    } catch (err) {
-        return res.status(500).json({success: false, message: `There was an error: ${err.message}`})
+    } catch (error) {
+        return res.status(500).json({success: false, message: `There was an error: ${error.message}`})
+    }
+}
+
+const isAuthenticated = async (req, res) => {
+    
+    try {
+        const cookies = req.cookies
+    
+        if (!cookies?.token) return res.status(200).json({success: false, message: 'User needs to login.'})
+        
+        const refreshToken = cookies.token
+    
+        jwt.verify(
+            refreshToken,
+            process.env.JWT_SECRET, 
+            async (err, decoded) => {
+                if (err) {
+                    res.clearCookie("token")
+                    return res.status(200).json({success: false, message: 'User needs to login.'}) 
+                }
+                const foundUser = await User.findById(decoded.userId)
+    
+                if (!foundUser) {
+                    res.clearCookie("token")
+                    return res.status(200).json({success: false, message: 'User needs to login.'}) 
+                }
+    
+                res.json({ success: true, message: "User logged in." })
+            }
+        )
+    } catch (error) {
+        return res.status(500).json({success: false, message: `There was an error: ${error.message}`})
     }
 }
 
@@ -231,7 +259,6 @@ module.exports = {
     verifyEmail,
     forgotPassword,
     resetPassword,
-    authCheck,
-    refresh
+    refresh,
+    isAuthenticated
 }
-

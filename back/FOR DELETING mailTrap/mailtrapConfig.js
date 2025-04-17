@@ -2,13 +2,16 @@ const { MailtrapClient } = require("mailtrap")
 const dotenv = require('dotenv');
 dotenv.config();
 
+
 const mailtrapClient = new MailtrapClient({ 
-    endpoint: process.env.MAILTRAP_ENDPOINT, 
-    token: process.env.MAILTRAP_TOKEN
+    token: process.env.MAILTRAP_TOKEN,
+    //FOR PROD
+    //endpoint: process.env.MAILTRAP_ENDPOINT,
 })
 
 const sender = {
-    email: "hello@demomailtrap.co",
+    //HAS TO BE THE VALID DOMAIN FROM WHERE THE EMAIL IS SENT
+    email: "hello@example.com",
     name: "Mailtrap Test",
 }
 

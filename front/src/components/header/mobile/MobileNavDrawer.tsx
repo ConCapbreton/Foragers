@@ -1,5 +1,5 @@
 import React from "react"
-import CircleX from "../../circleX/CircleX"
+import ModalHeader from "../../modal/ModalHeader"
 
 interface MobNavProps {
   setToggleMenu: React.Dispatch<React.SetStateAction<boolean>>
@@ -16,10 +16,7 @@ const MobileNavDrawer: React.FC<MobNavProps> = ({ setToggleMenu }) => {
 
   return (
     <>
-      <div id="mob-nav-opt">
-        <img src="./logored.webp" alt="Forager's Logo" height="50" width="50" />
-        <CircleX onClickSetter={setToggleMenu}/>
-      </div>
+      <ModalHeader setToggleModal={setToggleMenu}/>
       <div id="mob-btn-div">{navBtns}</div>
     </>
   )

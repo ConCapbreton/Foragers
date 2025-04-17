@@ -1,13 +1,10 @@
 import React, { useEffect } from "react"
 import { useState, useRef } from "react"
+import { ModNextCompProps } from "../../components/modal/Modal";
 
 type SubmitEventType = React.FormEvent<HTMLFormElement> | Event;
 
-interface EmailVerProps {
-    setNextPage: React.Dispatch<React.SetStateAction<boolean>>
-  }
-
-const EmailVerification: React.FC<EmailVerProps> = ({setNextPage}) => {
+const EmailVerification: React.FC<ModNextCompProps> = ({setNextPage}) => {
     const [code, setCode] = useState<string[]>(["", "", "", "", "", ""])
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
     
@@ -72,7 +69,7 @@ const EmailVerification: React.FC<EmailVerProps> = ({setNextPage}) => {
             ))}
         </div>
         <button className="btn verify-email-submit">Verify Email</button>
-        <button className="back-page" type="button" onClick={() => {setNextPage(false)}}>
+        <button className="back-page link" type="button" onClick={() => {setNextPage(false)}}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
             </svg>

@@ -1,32 +1,29 @@
-import { useState, useEffect, RefObject } from "react"
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useState, useEffect } from "react" //RefObject
+ // import ReCAPTCHA from 'react-google-recaptcha'
 import GoogleLogin from "./GoogleLogin"
-
-interface SignupProps {
-  toggleModal: boolean,
-  setNextPage: React.Dispatch<React.SetStateAction<boolean>>,
-  reRef: RefObject<ReCAPTCHA | null>,
-}
+import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner"
+import { useSignupUserMutation } from "../../app/api/authApiSlice"
+import { ModCompProps } from "../../components/modal/Modal"
 
 interface SignupForm {
   username: string,
   email: string,
-  bday: string,
+  dob: string,
   password: string,
   confirmPwd: string,
-  isTAndC: boolean,
+  termsAccepted: boolean,
 }
 
-const Signup: React.FC<SignupProps> = ({toggleModal, setNextPage, reRef}) => {
-  
+const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage }) => { //reRef
+  const [signupUser, { isLoading }] = useSignupUserMutation()
   const [userMsg, setUserMsg] = useState('')
   const [formData, setFormData] = useState<SignupForm>({
     username: '',
     email: '',
-    bday: '',
+    dob: '',
     password: '',
     confirmPwd: '',
-    isTAndC: false,
+    termsAccepted: false,
   })
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,21 +36,28 @@ const Signup: React.FC<SignupProps> = ({toggleModal, setNextPage, reRef}) => {
 
   async function handleSubmit (event: React.FormEvent<HTMLButtonElement>) {
     event.preventDefault()
+    setUserMsg("")
 
-    console.log(formData.bday)
-
+    // CHECKS on all inputs: username, email, dob, password, confirmPwd, termsAccepted,
     if (!formData.password) return
+    
 
-    //DO I NEED AN ERROR HANDLER FOR THIS??
-    const token = await reRef.current?.executeAsync()
-    //SEND TOKEN TO THE BACKEND ALOING WITH FORM DATA
-
-    console.log(token)
-    console.log(formData)
-    //TO TAKE YOU TO THE VALIDATE EMAIL PAGE
-    setNextPage(true)
-
-    reRef.current?.reset()
+    try {
+      const token = "" //await reRef.current?.executeAsync() ||
+      const signupResponse = await signupUser({...formData, token}).unwrap()
+      if (signupResponse.success) {
+        setNextPage(true)
+      } else {
+        setUserMsg("Login failed")
+      }
+    } catch (error: any) {
+      if (error?.status) {
+        setUserMsg(error.data?.message)
+      } else {
+        setUserMsg("Login failed")
+      }
+    } 
+    // reRef.current?.reset()  
   }
 
   useEffect(() => {
@@ -62,10 +66,10 @@ const Signup: React.FC<SignupProps> = ({toggleModal, setNextPage, reRef}) => {
       setFormData({
         username: '',
         email: '',
-        bday: '',
+        dob: '',
         password: '',
         confirmPwd: '',
-        isTAndC: false,
+        termsAccepted: false,
       })
     }
   }, [toggleModal])
@@ -110,8 +114,8 @@ const Signup: React.FC<SignupProps> = ({toggleModal, setNextPage, reRef}) => {
             id="signup-bday" 
             type="date" 
             required 
-            name="bday"
-            value={formData.bday}
+            name="dob"
+            value={formData.dob}
             onChange={handleInputChange}
           />
           <label htmlFor="signup-bday" id="bday-label">Date of birth</label>
@@ -151,13 +155,18 @@ const Signup: React.FC<SignupProps> = ({toggleModal, setNextPage, reRef}) => {
             id="signup-tandc" 
             type="checkbox" 
             required 
-            name="isTAndC"
-            checked={formData.isTAndC}
-            onChange={() => setFormData({...formData, isTAndC: !formData.isTAndC})}
+            name="termsAccepted"
+            checked={formData.termsAccepted}
+            onChange={() => setFormData({...formData, termsAccepted: !formData.termsAccepted})}
           />
           <label htmlFor="signup-tandc" id="tandc-label">I agree to the <a href="/termsandconditions">Terms and conditions</a> and the <a href="/privacypolicy">Privacy Policy</a></label>
         </div>
-        <button className="btn login-submit signup-submit" type="submit" onClick={handleSubmit}>Submit</button>
+        <button className="btn login-submit signup-submit" type="submit" onClick={handleSubmit}>
+          {isLoading 
+            ? <LoadingSpinner />
+            : <span>Submit</span>
+          }
+        </button>
         <p id="signup-user-msg">{userMsg}</p>
       </form>
     </>

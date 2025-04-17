@@ -25,7 +25,7 @@ const baseQueryWithReauth = async (args: any, api: BaseQueryApi, extraOptions: a
         if (refreshResult?.data) {
             const user = (api.getState() as Rootstate).auth.user
             //store the new token
-            api.dispatch(setCredentials({...refreshResult.data, user}))
+            api.dispatch(setCredentials({...refreshResult, user}))
             //retry the original query with new access token
             result = await baseQuery(args, api, extraOptions)
         } else {

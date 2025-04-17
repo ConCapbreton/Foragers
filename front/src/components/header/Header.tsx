@@ -10,7 +10,7 @@ const Header = () => {
 
   return (
     <header className="header">
-        <img className="header-logo" src="./logored.webp" alt="Foragers Logo" height="66" width="66" />
+        <img className="header-logo" src="/logored.webp" alt="Foragers Logo" height="66" width="66" />
         <HamburgerMenu setToggleMenu={setToggleMenu}/>
         <NavBtns />
         <MobileNav toggleMenu={toggleMenu} setToggleMenu={setToggleMenu}/>

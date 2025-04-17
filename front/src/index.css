@@ -26,6 +26,16 @@ body {
   text-align: center;
 }
 
+.link {
+  color: var(--forager-orange);
+  transition: transform 0.3s;
+  text-decoration: none;
+}
+
+.link:hover {
+  transform: scale(1.1);
+}
+
 @media (min-width: 768px) {
   .page {
     min-height: calc(100vh - 151px);

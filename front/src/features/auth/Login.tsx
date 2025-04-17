@@ -1,25 +1,24 @@
-import { useState, useEffect, RefObject } from "react"
+import { useState, useEffect } from "react" //RefObject 
 import { useNavigate } from 'react-router-dom'
-import ReCAPTCHA from 'react-google-recaptcha'
-
-// import { useDispatch } from 'react-redux'
-// import { setCredentials } from "./authSlice"
-
+import { useDispatch } from 'react-redux'
+import { setCredentials } from "./authSlice"
 import { useLoginUserMutation } from "../../app/api/authApiSlice"
 import { validateEmail } from "../../utils/validateInputs"
+// import ReCAPTCHA from 'react-google-recaptcha'
 import GoogleLogin from "./GoogleLogin"
+import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner"
 
 interface LoginProps {
   toggleModal: boolean,
   setNextPage: React.Dispatch<React.SetStateAction<boolean>>
-  reRef: RefObject<ReCAPTCHA | null>,
+  // reRef: RefObject<ReCAPTCHA | null>,
 }
 
-const Login: React.FC<LoginProps> = ({toggleModal, setNextPage, reRef}) => {
-  const [loginUser, {data: loginData, isSuccess: isLoginSuccess, isError: isLoginError, error: loginError}] = useLoginUserMutation()
+const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
   const [userMsg, setUserMsg] = useState("")
   const navigate = useNavigate()
-  // const dispatch = useDispatch()
+  const [loginUser, { isLoading: isLoginLoading }] = useLoginUserMutation()
+  const dispatch = useDispatch()
 
   const [formData, setFormData] = useState({
     email: '',
@@ -35,10 +34,7 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage, reRef}) => {
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    //CHECK EMAIL USING REGEX (NO CHECK ON PASSWORD)
-    //CHECK BOTH EMAIL AND PASSWORD ARE PRESENT BEFORE TRYING SERVER
-    
+    event.preventDefault()    
     setUserMsg("")
 
     const isEmail = validateEmail(formData.email)
@@ -53,25 +49,23 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage, reRef}) => {
     }
     
     try {
-      const token = await reRef.current?.executeAsync() || ""
-
-      if (formData.email && formData.password) {
-        await loginUser({...formData, token}).unwrap()
-        console.log(loginData, isLoginSuccess, isLoginError, loginError)
-        navigate
-        // dispatch(setCredentials({...userData}))
+      const token = "" //await reRef.current?.executeAsync() || 
+      const userData = await loginUser({...formData, token}).unwrap()
+      if (userData.success) {
+        dispatch(setCredentials({accessToken: userData.accessToken, username: userData.username}))
+        navigate('/new-entry')
+      } else {
+        setUserMsg("Login failed")
       }
-    } catch (error) {
-      //NEED TO HAVE A MESSAGE AREA IN THE COMPONENT TO COMMUNICATE WITH THE USER. 
-      console.log(error)
-    }
-    
-    
-    
-    //SEND TOKEN TO THE BACKEND ALOING WITH FORM DATA
-   
-    
-    reRef.current?.reset()
+
+    } catch (error: any) {
+      if (error?.status) {
+        setUserMsg(error.data?.message)
+      } else {
+        setUserMsg("Login failed")
+      }
+    } 
+    // reRef.current?.reset()
   }
 
   useEffect(() => {
@@ -116,9 +110,14 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage, reRef}) => {
             <label htmlFor="login-password">Password</label>
           </div>
         </div>
-        <button id="forgot-pwd" type="button" onClick={() => {setNextPage(true)}}>Forgot password?</button>
-        <button className="btn login-submit" type="submit">Submit</button>
-        <p id="user-msg">{userMsg}</p>
+        <button id="forgot-pwd" className="link" type="button" onClick={() => {setNextPage(true)}}>Forgot password?</button>
+        <button className="btn login-submit" type="submit">
+          {isLoginLoading 
+            ? <LoadingSpinner />
+            : <span>Submit</span>
+          }
+        </button>
+        <p className="user-msg">{userMsg}</p>
       </form>
     </>
   )

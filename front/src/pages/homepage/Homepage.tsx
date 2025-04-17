@@ -3,18 +3,33 @@ import Modal from '../../components/modal/Modal'
 import Login from '../../features/auth/Login'
 import Signup from '../../features/auth/Signup'
 import { useState } from 'react'
-// import { useCheckAuthQuery } from '../../features/auth/authSlice'
+import { useNavigate } from 'react-router-dom'
+import { useIsAuthQuery } from '../../app/api/authApiSlice'
 import ForgotPassword from '../../features/auth/ForgotPassword'
 import EmailVerification from '../../features/auth/EmailVerification'
+import LoadingSpinner from '../../components/loadingspinner/LoadingSpinner'
 
 const Homepage = () => {
-  //const { data, isLoading } = useCheckAuthQuery()
+  const navigate = useNavigate()
+  const {data: isLoggedIn, isLoading, isSuccess, isError }  = useIsAuthQuery(undefined)
+
   const [loginModal, setLoginModal] = useState(false)
   const [signupModal, setSignupModal] = useState(false)
-  
-  
-  return (
-    <div className="page homepage">
+
+  let content
+
+  if (isLoading) {
+    content = <div className="page homepage">
+      <LoadingSpinner />
+    </div>
+  }
+
+  if (isLoggedIn?.success) {
+    navigate('/new-entry')
+  }
+
+  if ((isSuccess && !isLoggedIn?.success) || isError) {
+    content = <div className="page homepage">
       <h1 className="page-title">Welcome to Foragers</h1>
       <div className="button-div">
         <button className="btn login-btn" onClick={() => setLoginModal(true)}>Login</button>
@@ -25,7 +40,10 @@ const Homepage = () => {
       <Modal Component={Login} NextComponent={ForgotPassword} toggleModal={loginModal} setToggleModal={setLoginModal} />
       <Modal Component={Signup} NextComponent={EmailVerification} toggleModal={signupModal} setToggleModal={setSignupModal}/>
     </div>
-  )
+  }
+
+  return content
+
 }
 
   export default Homepage
