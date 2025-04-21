@@ -3,6 +3,8 @@ import { useState, useEffect } from "react" //RefObject
 import GoogleLogin from "./GoogleLogin"
 import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner"
 import { useSignupUserMutation } from "../../app/api/authApiSlice"
+import { validateUsername, validateEmail, validateDob, validatePassword } from "../../utils/validateInputs"
+import { containsHTML, safelyTrimInputs } from "../../utils/sanitizeInputs"
 import { ModCompProps } from "../../components/modal/Modal"
 
 interface SignupForm {
@@ -38,23 +40,57 @@ const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage }) => { //reRe
     event.preventDefault()
     setUserMsg("")
 
-    // CHECKS on all inputs: username, email, dob, password, confirmPwd, termsAccepted,
-    if (!formData.password) return
-    
+    const inputsToTrim = ['username', 'email', 'dob']
+    safelyTrimInputs(formData, inputsToTrim)
 
+    const isHTML = containsHTML(Object.values(formData))
+    if (isHTML.success) {
+      setUserMsg(isHTML.message || "")
+      return
+    }
+    
+    const isUsername = validateUsername(formData.username)
+    if (!isUsername.success) {
+      setUserMsg(isUsername.message || "")
+      return
+    }
+    
+    const isEmail = validateEmail(formData.email)
+    if (!isEmail.success) {
+      setUserMsg(isEmail.message || "")
+      return
+    }
+
+    const isDob = validateDob(formData.dob) 
+    if (!isDob.success) {
+      setUserMsg(isDob.message || "")
+      return
+    }
+
+    const isPwd = validatePassword(formData.password, formData.confirmPwd) 
+    if (!isPwd.success) {
+      setUserMsg(isPwd.message || "")
+      return
+    }
+
+    if (!formData.termsAccepted) {
+      setUserMsg("Please accept our Terms and conditions and Privacy Policy")
+      return
+    }
+    
     try {
       const token = "" //await reRef.current?.executeAsync() ||
       const signupResponse = await signupUser({...formData, token}).unwrap()
       if (signupResponse.success) {
         setNextPage(true)
       } else {
-        setUserMsg("Login failed")
+        setUserMsg("Signup failed")
       }
     } catch (error: any) {
       if (error?.status) {
         setUserMsg(error.data?.message)
       } else {
-        setUserMsg("Login failed")
+        setUserMsg("Signup failed")
       }
     } 
     // reRef.current?.reset()  

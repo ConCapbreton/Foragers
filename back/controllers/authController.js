@@ -9,30 +9,42 @@ const { generateAccessToken } = require('../utils/generateAccessToken')
 
 
 const signup = async (req, res) => {
-    const {email, password, username} = req.body
-    //USER MODEL: 
-    // username, email, dob, password, roles, lastLogin, isVerified, isActive, termsAccepted, termsAcceptedAt, termsVersion
+    const {username, email, password, dob, termsAccepted } = req.body
 
+    if (!username || !email || !password || !dob) {
+        return res.status(400).json({success: false, message: "All fields are required."})
+    }
+
+    if (!termsAccepted) {
+        return res.status(403).json({success: false, message: "Please accept the Terms and conditions and Privacy Policy"})
+    }
 
     try {
-        if (!email || !password || !username) {
-            //BETTER TO res.status().json() here so that you can provide the correct res status
-            throw new Error("All fields are required")
-        }
+        
+        const userAlreadyExists = await User.findOne({
+            $or: [
+                { email: email },
+                { username: username }
+            ]
+        }) 
 
-        const userAlreadyExists = await User.findOne({email}) 
         if (userAlreadyExists) {
-            return res.status(400).json({success: false, message: "User already exists"})
+            const duplicateField = userAlreadyExists.email === email ? "Email" : "Username"
+            return res.status(400).json({success: false, message: `${duplicateField} already exists.`})
         }
 
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString()
-
         const hashedPwd = await argon2.hash(password)
 
         const user = new User({
-            email,
-            password: hashedPwd,
+            //roles, isVerified, isActive, lastLogin have default values in User model
             username,
+            email,
+            dob: dob,
+            password: hashedPwd,
+            termsAccepted,
+            termsAcceptedAt: new Date(),
+            termsVersion: process.env.TERMS_PRIVACY_VERSION,
             verificationToken: verificationToken,
             verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000 //24 hours
         })
@@ -57,7 +69,7 @@ const verifyEmail = async (req, res) => {
         })
 
         if (!user) {
-            return res.status(400).json({success: false, message: "Invalid or expired verification code"})
+            return res.status(400).json({success: false, message: "Invalid or expired verification code."})
         }
 
         user.isVerified = true
@@ -70,14 +82,10 @@ const verifyEmail = async (req, res) => {
         generateTokenAndSendCookie(res, user._id)
         accessToken = generateAccessToken(user.email)
 
-        //GOING TO LOG IN THE USER IMMEDIATELY
         res.status(200).json({
             success: true, 
-            message: "Email verified", 
             accessToken,         
-            user: {
-                username: user.username
-            }
+            username: user.username,
         })
 
     } catch (error) {

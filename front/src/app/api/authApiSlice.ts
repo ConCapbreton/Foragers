@@ -24,6 +24,13 @@ export const authApiSlice = createApi({
                 body: {...userDetails}
             }),
         }),
+        verifyEmail: builder.mutation({
+            query: (code: string) => ({
+                url: '/api/auth/verify-email',
+                method: 'POST',
+                body: { code }
+            }),
+        }),
         loginUser: builder.mutation({
             query: (userDetails: {email: string, password: string, token: string}) => ({
                 url: '/api/auth/login',
@@ -52,6 +59,7 @@ export const {
     useIsAuthQuery,
     useRefreshQuery,
     useSignupUserMutation,
+    useVerifyEmailMutation,
     useLoginUserMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,

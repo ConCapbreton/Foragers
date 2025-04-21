@@ -35,7 +35,7 @@ const Homepage = () => {
         <button className="btn login-btn" onClick={() => setLoginModal(true)}>Login</button>
         <button className="btn signup-btn" onClick={() => setSignupModal(true)}>Sign Up</button>
       </div>
-      <img className="body-logo" src="./logowhite.webp" alt="Foragers Logo" height="250" width="250"/>
+      <img className="body-logo" src="./foragersLogo.webp" alt="Foragers Logo" height="250" width="250"/>
       <hr />
       <Modal Component={Login} NextComponent={ForgotPassword} toggleModal={loginModal} setToggleModal={setLoginModal} />
       <Modal Component={Signup} NextComponent={EmailVerification} toggleModal={signupModal} setToggleModal={setSignupModal}/>

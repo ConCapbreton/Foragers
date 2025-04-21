@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { setCredentials } from "./authSlice"
 import { useLoginUserMutation } from "../../app/api/authApiSlice"
 import { validateEmail } from "../../utils/validateInputs"
+import { containsHTML,safelyTrimInputs } from "../../utils/sanitizeInputs"
 // import ReCAPTCHA from 'react-google-recaptcha'
 import GoogleLogin from "./GoogleLogin"
 import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner"
@@ -36,6 +37,15 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()    
     setUserMsg("")
+
+    const inputsToTrim = ['email']
+    safelyTrimInputs(formData, inputsToTrim)
+
+    const isHTML = containsHTML(Object.values(formData))
+    if (isHTML.success) {
+      setUserMsg(isHTML.message || "")
+      return
+    }
 
     const isEmail = validateEmail(formData.email)
     if (!isEmail.success) {

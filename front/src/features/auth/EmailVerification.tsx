@@ -1,12 +1,22 @@
 import React, { useEffect } from "react"
 import { useState, useRef } from "react"
-import { ModNextCompProps } from "../../components/modal/Modal";
+import { ModNextCompProps } from "../../components/modal/Modal"
+import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner";
+import { useVerifyEmailMutation } from "../../app/api/authApiSlice"
+import { useDispatch } from 'react-redux'
+import { setCredentials } from "./authSlice"
+import { useNavigate } from 'react-router-dom'
+
 
 type SubmitEventType = React.FormEvent<HTMLFormElement> | Event;
 
 const EmailVerification: React.FC<ModNextCompProps> = ({setNextPage}) => {
     const [code, setCode] = useState<string[]>(["", "", "", "", "", ""])
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+    const [userMsg, setUserMsg] = useState("")
+    const [verifyEmail, { isLoading }] = useVerifyEmailMutation()
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     
     const handleChange = (index: number, value: string) => {
         const newCode: string[] = [...code]
@@ -38,10 +48,27 @@ const EmailVerification: React.FC<ModNextCompProps> = ({setNextPage}) => {
         }
     }
 
-    const handleSubmit = (event: SubmitEventType) => {
+    const handleSubmit = async (event: SubmitEventType) => {
         event.preventDefault()
         const verificationCode = code.join("")
-        console.log(verificationCode)
+    
+        try {
+
+            const userData = await verifyEmail(verificationCode).unwrap()
+            if (userData.success) {
+                dispatch(setCredentials({accessToken: userData.accessToken, username: userData.username}))
+                navigate('/new-entry')
+            } else {
+                setUserMsg("Email verification failed")
+            }
+
+        } catch (error: any) {
+            if (error?.status) {
+                setUserMsg(error.data?.message)
+            } else {
+                setUserMsg("Login failed")
+            }
+        } 
     }
 
     useEffect(() => {
@@ -68,7 +95,13 @@ const EmailVerification: React.FC<ModNextCompProps> = ({setNextPage}) => {
                 />
             ))}
         </div>
-        <button className="btn verify-email-submit">Verify Email</button>
+        <button className="btn verify-email-submit">
+            {isLoading 
+                ? <LoadingSpinner />
+                : <span> Verify Email</span>
+            }
+        </button>
+        <p className="user-msg">{userMsg}</p>
         <button className="back-page link" type="button" onClick={() => {setNextPage(false)}}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
