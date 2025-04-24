@@ -1,21 +1,15 @@
-import { useState, useEffect } from "react" //RefObject 
+import { useState, useEffect } from "react" 
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setCredentials } from "./authSlice"
 import { useLoginUserMutation } from "../../app/api/authApiSlice"
 import { validateEmail } from "../../utils/validateInputs"
 import { containsHTML,safelyTrimInputs } from "../../utils/sanitizeInputs"
-// import ReCAPTCHA from 'react-google-recaptcha'
 import GoogleLogin from "./GoogleLogin"
 import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner"
+import { ModCompProps } from "../../components/modal/Modal"
 
-interface LoginProps {
-  toggleModal: boolean,
-  setNextPage: React.Dispatch<React.SetStateAction<boolean>>
-  // reRef: RefObject<ReCAPTCHA | null>,
-}
-
-const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
+const Login: React.FC<ModCompProps> = ({toggleModal, setNextPage, reRef }) => { 
   const [userMsg, setUserMsg] = useState("")
   const navigate = useNavigate()
   const [loginUser, { isLoading: isLoginLoading }] = useLoginUserMutation()
@@ -41,9 +35,9 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
     const inputsToTrim = ['email']
     safelyTrimInputs(formData, inputsToTrim)
 
-    const isHTML = containsHTML(Object.values(formData))
-    if (isHTML.success) {
-      setUserMsg(isHTML.message || "")
+    const noHTML = containsHTML(Object.values(formData))
+    if (!noHTML.success) {
+      setUserMsg(noHTML.message || "")
       return
     }
 
@@ -59,7 +53,7 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
     }
     
     try {
-      const token = "" //await reRef.current?.executeAsync() || 
+      const token = await reRef.current?.executeAsync() || ""
       const userData = await loginUser({...formData, token}).unwrap()
       if (userData.success) {
         dispatch(setCredentials({accessToken: userData.accessToken, username: userData.username}))
@@ -75,7 +69,7 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
         setUserMsg("Login failed")
       }
     } 
-    // reRef.current?.reset()
+    reRef.current?.reset()
   }
 
   useEffect(() => {
@@ -89,47 +83,45 @@ const Login: React.FC<LoginProps> = ({toggleModal, setNextPage }) => { //reRef
   }, [toggleModal])
 
   return (
-    <>
-      <form id="login-form" onSubmit={handleSubmit}>
-        <h2 id="login-title">Foragers Login</h2>
-        <GoogleLogin />
-        <div id="login-input-div">
-          <div className="signup-input-div">
-            <input 
-              id="login-email" 
-              type="email"  
-              required 
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder=""
-            />
-            <label htmlFor="login-email">Email</label>
-          </div>
-          
-          <div className="signup-input-div">
-            <input 
-              id="login-password" 
-              type="password" 
-              required 
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder=""
-            />
-            <label htmlFor="login-password">Password</label>
-          </div>
+    <form id="login-form" onSubmit={handleSubmit}>
+      <h2 id="login-title">Foragers Login</h2>
+      <GoogleLogin />
+      <div id="login-input-div">
+        <div className="signup-input-div">
+          <input 
+            id="login-email" 
+            type="email"  
+            required 
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder=""
+          />
+          <label htmlFor="login-email">Email</label>
         </div>
-        <button id="forgot-pwd" className="link" type="button" onClick={() => {setNextPage(true)}}>Forgot password?</button>
-        <button className="btn login-submit" type="submit">
-          {isLoginLoading 
-            ? <LoadingSpinner />
-            : <span>Submit</span>
-          }
-        </button>
-        <p className="user-msg">{userMsg}</p>
-      </form>
-    </>
+        
+        <div className="signup-input-div">
+          <input 
+            id="login-password" 
+            type="password" 
+            required 
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            placeholder=""
+          />
+          <label htmlFor="login-password">Password</label>
+        </div>
+      </div>
+      <button id="forgot-pwd" className="link" type="button" onClick={() => {setNextPage(true)}}>Forgot password?</button>
+      <button className="btn login-submit" type="submit">
+        {isLoginLoading 
+          ? <LoadingSpinner />
+          : <span>Submit</span>
+        }
+      </button>
+      <p className="user-msg">{userMsg}</p>
+    </form>
   )
 }
 

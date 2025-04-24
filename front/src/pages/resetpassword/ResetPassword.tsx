@@ -25,18 +25,9 @@ const ResetPassword = () => {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()    
-    setUserMsg("")
-
-    if (formData.password === "" || formData.confirmPwd === "") {
-    setUserMsg("Please enter a password and confirm your password.")
-    return
-    } 
+    setUserMsg("")  
     
-    if (formData.password !== formData.confirmPwd) {
-    setUserMsg("Your passwords do not match.") 
-    }
-    
-    const isPwd = validatePassword(formData.password)
+    const isPwd = validatePassword(formData.password, formData.confirmPwd)
     if (!isPwd.success) {
       setUserMsg(isPwd.message || "")
       return
@@ -111,7 +102,7 @@ const ResetPassword = () => {
       <div className="modal-div" >
         <div className="modal-display"> 
           <div className="reset-pwd-header">
-            <img src="/logored.webp" alt="Forager's Logo" height="50" width="50" />
+            <img src="/foragersLogo.webp" alt="Forager's Logo" height="50" width="50" />
           </div>
           <h2 id="reset-title">Foragers Reset Password</h2>
           {content}  

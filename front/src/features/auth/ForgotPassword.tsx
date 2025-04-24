@@ -9,10 +9,6 @@ const ForgotPassword: React.FC<ModNextCompProps> = ({ toggleModal, nextPage, set
   const [emailSent, setEmailSent] = useState(false)
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation()
   const [formData, setFormData] = useState({email: ''})
-  
-  //let content
-  //submit worked - success screen (password sent)
-  //submit didnt work - retry ()
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target

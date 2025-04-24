@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react" //RefObject
- // import ReCAPTCHA from 'react-google-recaptcha'
+import { useState, useEffect } from "react" 
 import GoogleLogin from "./GoogleLogin"
 import LoadingSpinner from "../../components/loadingspinner/LoadingSpinner"
 import { useSignupUserMutation } from "../../app/api/authApiSlice"
@@ -16,7 +15,7 @@ interface SignupForm {
   termsAccepted: boolean,
 }
 
-const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage }) => { //reRef
+const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage, reRef }) => {
   const [signupUser, { isLoading }] = useSignupUserMutation()
   const [userMsg, setUserMsg] = useState('')
   const [formData, setFormData] = useState<SignupForm>({
@@ -36,16 +35,16 @@ const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage }) => { //reRe
     })
   }
 
-  async function handleSubmit (event: React.FormEvent<HTMLButtonElement>) {
+  async function handleSubmit (event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setUserMsg("")
 
     const inputsToTrim = ['username', 'email', 'dob']
     safelyTrimInputs(formData, inputsToTrim)
 
-    const isHTML = containsHTML(Object.values(formData))
-    if (isHTML.success) {
-      setUserMsg(isHTML.message || "")
+    const noHTML = containsHTML(Object.values(formData))
+    if (!noHTML.success) {
+      setUserMsg(noHTML.message || "")
       return
     }
     
@@ -79,21 +78,21 @@ const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage }) => { //reRe
     }
     
     try {
-      const token = "" //await reRef.current?.executeAsync() ||
+      const token =  await reRef.current?.executeAsync() || ""
       const signupResponse = await signupUser({...formData, token}).unwrap()
       if (signupResponse.success) {
         setNextPage(true)
       } else {
-        setUserMsg("Signup failed")
+        setUserMsg("Signup failed.")
       }
     } catch (error: any) {
       if (error?.status) {
         setUserMsg(error.data?.message)
       } else {
-        setUserMsg("Signup failed")
+        setUserMsg("Signup failed.")
       }
     } 
-    // reRef.current?.reset()  
+    reRef.current?.reset()  
   }
 
   useEffect(() => {
@@ -111,101 +110,98 @@ const Signup: React.FC<ModCompProps> = ({toggleModal, setNextPage }) => { //reRe
   }, [toggleModal])
 
   return (
-    <>
-      <form id="signup-form">
-        <h2 id="signup-title">Foragers Sign Up</h2>
-        <GoogleLogin />
-        <div className="signup-input-div">
-          <input 
-            id="signup-username" 
-            type="text" 
-            minLength={3} 
-            maxLength={20} 
-            required 
-            name="username"
-            value={formData.username}
-            onChange={handleInputChange}
-            placeholder=""
-          />
-          <label htmlFor="signup-username">Username</label>
-        </div>
+    <form id="signup-form" onSubmit={handleSubmit}>
+      <h2 id="signup-title">Foragers Sign Up</h2>
+      <GoogleLogin />
+      <div className="signup-input-div">
+        <input 
+          id="signup-username" 
+          type="text" 
+          minLength={3} 
+          maxLength={20} 
+          required 
+          name="username"
+          value={formData.username}
+          onChange={handleInputChange}
+          placeholder=""
+        />
+        <label htmlFor="signup-username">Username</label>
+      </div>
+      
+      <div className="signup-input-div">
         
-        <div className="signup-input-div">
-          
-          <input 
-            id="signup-email" 
-            type="email" 
-            required 
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder=""
-          />
-          <label htmlFor="signup-email">Email</label>
-        </div>
+        <input 
+          id="signup-email" 
+          type="email" 
+          required 
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          placeholder=""
+        />
+        <label htmlFor="signup-email">Email</label>
+      </div>
 
-        <div className="signup-input-div">
-          
-          <input 
-            id="signup-bday" 
-            type="date" 
-            required 
-            name="dob"
-            value={formData.dob}
-            onChange={handleInputChange}
-          />
-          <label htmlFor="signup-bday" id="bday-label">Date of birth</label>
-        </div>
+      <div className="signup-input-div">
         
-        <div className="signup-input-div">
-        
-          <input 
-            id="signup-password" 
-            type="password" 
-            minLength={6}
-            required 
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder=""
-          />
-          <label htmlFor="signup-password">Password</label>
-        </div>
-        
-        <div className="signup-input-div">
-          <input 
-            id="signup-confirm-pwd" 
-            type="password" 
-            minLength={6}
-            required 
-            name="confirmPwd"
-            value={formData.confirmPwd}
-            onChange={handleInputChange}
-            placeholder=""
-          />
-          <label htmlFor="signup-confirm-pwd">Confirm password</label>
-        </div>
-        
-        <div id="signup-checkbox">
-          <input 
-            id="signup-tandc" 
-            type="checkbox" 
-            required 
-            name="termsAccepted"
-            checked={formData.termsAccepted}
-            onChange={() => setFormData({...formData, termsAccepted: !formData.termsAccepted})}
-          />
-          <label htmlFor="signup-tandc" id="tandc-label">I agree to the <a href="/termsandconditions">Terms and conditions</a> and the <a href="/privacypolicy">Privacy Policy</a></label>
-        </div>
-        <button className="btn login-submit signup-submit" type="submit" onClick={handleSubmit}>
-          {isLoading 
-            ? <LoadingSpinner />
-            : <span>Submit</span>
-          }
-        </button>
-        <p id="signup-user-msg">{userMsg}</p>
-      </form>
-    </>
+        <input 
+          id="signup-bday" 
+          type="date" 
+          required 
+          name="dob"
+          value={formData.dob}
+          onChange={handleInputChange}
+        />
+        <label htmlFor="signup-bday" id="bday-label">Date of birth</label>
+      </div>
+      
+      <div className="signup-input-div">
+        <input 
+          id="signup-password" 
+          type="password" 
+          minLength={6}
+          required 
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          placeholder=""
+        />
+        <label htmlFor="signup-password">Password</label>
+      </div>
+      
+      <div className="signup-input-div">
+        <input 
+          id="signup-confirm-pwd" 
+          type="password" 
+          minLength={6}
+          required 
+          name="confirmPwd"
+          value={formData.confirmPwd}
+          onChange={handleInputChange}
+          placeholder=""
+        />
+        <label htmlFor="signup-confirm-pwd">Confirm password</label>
+      </div>
+      
+      <div id="signup-checkbox">
+        <input 
+          id="signup-tandc" 
+          type="checkbox" 
+          required 
+          name="termsAccepted"
+          checked={formData.termsAccepted}
+          onChange={() => setFormData({...formData, termsAccepted: !formData.termsAccepted})}
+        />
+        <label htmlFor="signup-tandc" id="tandc-label">I agree to the <a href="/termsandconditions">Terms and conditions</a> and the <a href="/privacypolicy">Privacy Policy</a></label>
+      </div>
+      <button className="btn login-submit signup-submit" type="submit">
+        {isLoading 
+          ? <LoadingSpinner />
+          : <span>Submit</span>
+        }
+      </button>
+      <p id="signup-user-msg">{userMsg}</p>
+    </form>
   )
 }
 

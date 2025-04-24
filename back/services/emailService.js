@@ -49,7 +49,6 @@ const sendPasswordResetEmail = async (email, resetURL) => {
         })
 
     } catch (error) {
-        console.log(error)
         throw new Error(`Error sending password reset email: ${error}`)
     }
 }

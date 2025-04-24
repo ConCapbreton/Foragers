@@ -7,8 +7,10 @@ import NewEntry from './pages/newentry/NewEntry'
 import YouNeedToLogin from './pages/youneedtologin/YouNeedToLogin'
 import RequireAuth from './features/auth/RequireAuth'
 import ResetPassword from './pages/resetpassword/ResetPassword'
+import CompleteGoogleSignup from './pages/completegooglesignup/CompleteGoogleSignup'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 
 function App() {
   
@@ -24,6 +26,7 @@ function App() {
           {/* <Route path="about" element={<About />} /> SYNTAX FOR OTHER PUBLIC ROUTES */}
           <Route path="you-need-to-login" element={<YouNeedToLogin />} /> 
           <Route path="reset-password/:token" element={<ResetPassword />} /> 
+          <Route path="complete-google-signup/:completeProfileToken" element={<CompleteGoogleSignup />} /> 
           
           {/* PROTECTED */}
           <Route element={<RequireAuth />}>

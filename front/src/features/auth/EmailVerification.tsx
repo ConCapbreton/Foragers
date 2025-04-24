@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux'
 import { setCredentials } from "./authSlice"
 import { useNavigate } from 'react-router-dom'
 
+// CONSIDER UPDATING THIS WITH A BUTTON TO SEND ANOTHER CODE TO THE USER's EMAIL.
 
 type SubmitEventType = React.FormEvent<HTMLFormElement> | Event;
 
@@ -78,38 +79,38 @@ const EmailVerification: React.FC<ModNextCompProps> = ({setNextPage}) => {
     }, [code])
     
     return (
-    <form id="verify-email-form" onSubmit={handleSubmit}>
-        <h2>Verify your email</h2>
-        <p id="verify-email-msg">Enter the 6 digit code sent to your email address</p>
-        <div id="verify-inputs-div">
-            {code.map((digit, index) => (
-                <input 
-                    key={index}
-                    ref={(el) => {(inputRefs.current[index] = el)}}
-                    type='text'
-                    maxLength={6}
-                    value={digit}
-                    onChange={(event) => handleChange(index, event.target.value)}
-                    onKeyDown={(event) => handleKeyDown(index, event)}
-                    className="verify-inputs"
-                />
-            ))}
-        </div>
-        <button className="btn verify-email-submit">
-            {isLoading 
-                ? <LoadingSpinner />
-                : <span> Verify Email</span>
-            }
-        </button>
-        <p className="user-msg">{userMsg}</p>
-        <button className="back-page link" type="button" onClick={() => {setNextPage(false)}}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-            </svg>
-            <p>Back to Sign Up</p>
-        </button>
-    </form>
-  )
+        <form id="verify-email-form" onSubmit={handleSubmit}>
+            <h2>Verify your email</h2>
+            <p id="verify-email-msg">Enter the 6 digit code sent to your email address</p>
+            <div id="verify-inputs-div">
+                {code.map((digit, index) => (
+                    <input 
+                        key={index}
+                        ref={(el) => {(inputRefs.current[index] = el)}}
+                        type='text'
+                        maxLength={6}
+                        value={digit}
+                        onChange={(event) => handleChange(index, event.target.value)}
+                        onKeyDown={(event) => handleKeyDown(index, event)}
+                        className="verify-inputs"
+                    />
+                ))}
+            </div>
+            <button className="btn verify-email-submit">
+                {isLoading 
+                    ? <LoadingSpinner />
+                    : <span> Verify Email</span>
+                }
+            </button>
+            <p className="user-msg">{userMsg}</p>
+            <button className="back-page link" type="button" onClick={() => {setNextPage(false)}}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                </svg>
+                <p>Back to Sign Up</p>
+            </button>
+        </form>
+    )
 }
 
 export default EmailVerification

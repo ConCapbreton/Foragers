@@ -52,6 +52,13 @@ export const authApiSlice = createApi({
                 body: {password: resetDetails.password}
             }),
         }),
+        completeProfile: builder.mutation({
+            query: (userDetails: {username: string, dob: string, termsAccepted: boolean, completeProfileToken: string}) => ({
+                url: `/api/auth//complete-profile`,
+                method: 'POST',
+                body: {...userDetails}
+            }),
+        }),
     }),
 })
 
@@ -63,4 +70,5 @@ export const {
     useLoginUserMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,
+    useCompleteProfileMutation,
 } = authApiSlice

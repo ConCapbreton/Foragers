@@ -1,5 +1,5 @@
 const express = require('express')
-const { signup, verifyEmail, login, logout, forgotPassword, resetPassword, refresh, isAuthenticated } = require('../controllers/authController')
+const { signup, verifyEmail, login, logout, forgotPassword, resetPassword, refresh, isAuthenticated, googleOauth, completeProfile } = require('../controllers/authController')
 //const { verifyToken } = require('../middleware/verifyToken')
 
 const router = express.Router()
@@ -14,5 +14,7 @@ router.post('/logout', logout)
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password/:token', resetPassword)
 
+router.get('/google-oauth', googleOauth)
+router.post('/complete-profile', completeProfile)
 
 module.exports = router

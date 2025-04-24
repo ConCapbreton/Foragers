@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true,
+        // required: true, required logic handled by signup / googleOauth functions in authController
         unique: true,
         trim: true, 
         minlength: [3, 'Username must be at least 3 characters long'],  
@@ -18,17 +18,24 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,  
         trim: true,        
-        match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'], 
+        // match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'], rely on validator in signup or isVerified for Google users.  
     },
     dob: {
-        type: Date,
-        required: true,
+        type: String,
+        // Not type: Date as this field will be encrypted.
+        // required: true, required logic handled by signup / googleOauth functions in authController
     },
     password: {
         type: String,
         required: true,
         minlength: [6, 'Password must be at least 6 characters long'],
     },
+    googleId: {
+        type: String,
+        index: true,
+        unique: true,
+        sparse: true, // Ensures the unique constraint is only enforced when this field actually exists
+      },
     roles: {
         type: [String],
         enum: ['admin', 'user'],
@@ -56,6 +63,8 @@ const userSchema = new mongoose.Schema({
     termsVersion: {
         type: String
     },
+    completeProfileToken: String,
+    completeProfileTokenExpiresAt: Date,
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
     verificationToken: String,

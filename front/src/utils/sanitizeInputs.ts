@@ -4,14 +4,14 @@ export const containsHTML = (inputArray: any[]): {success: boolean, message?: st
   for (let i = 0; i < inputArray.length; i++) {
     if (typeof inputArray[i] === 'string' && regex.test(inputArray[i])) {
       return {
-        success: true,
+        success: false,
         message: "Unsupported formatting was detected. Please remove any code or tags."
       }    
     }
   }
     
   return {
-    success: false,
+    success: true,
   }    
 }
 

@@ -21,7 +21,7 @@ const RequireAuth = () => {
 
   useEffect(() => {    
     if (isSuccess && data?.success) {
-      dispatch(setCredentials({accessToken: data.accessToken, user: data.user }))
+      dispatch(setCredentials({accessToken: data.accessToken, username: data.username }))
     }
     if (isError) {
       setAuthChecked(true)
