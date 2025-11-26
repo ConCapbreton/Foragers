@@ -1,3 +1,5 @@
+//NEED TO UPDATE THIS WITH THE BEARER CODE THAT IS IN THE COMMENTS BELOW
+
 const jwt = require('jsonwebtoken')
 
 const verifyToken = (req, res, next) => {

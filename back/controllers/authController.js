@@ -16,7 +16,7 @@ const signup = async (req, res) => {
     const isHuman = await validateHuman(token)
 
     if (!isHuman) {
-        res.status(400).json({succes: false, message: "Failed ReCaptcha validation"})
+        res.status(400).json({succes: false, message: "Failed ReCaptcha validation."})
         return
     }
     
@@ -28,6 +28,8 @@ const signup = async (req, res) => {
         return res.status(400).json({success: false, message: 'Please provide a valid email address.'});
     }
 
+    //IF YOU WANT TO DO A REGEX CHECK ON YOUR PASSWORD YOU NEED TO DO IT HERE AS THE BACKEND RECEIVES A HASHED VERSION...
+    
     if (!termsAccepted) {
         return res.status(403).json({success: false, message: "Please accept the Terms and conditions and Privacy Policy"})
     }

@@ -9,6 +9,8 @@ import ForgotPassword from '../../features/auth/ForgotPassword'
 import EmailVerification from '../../features/auth/EmailVerification'
 import LoadingSpinner from '../../components/loadingspinner/LoadingSpinner'
 
+//MOVE THE CHECK LOGIC TO THE LAYOUT COMPONENT
+
 const Homepage = () => {
   const navigate = useNavigate()
   const {data: isLoggedIn, isLoading, isSuccess, isError }  = useIsAuthQuery(undefined)
